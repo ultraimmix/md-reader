@@ -85,7 +85,26 @@ function main(data: Data) {
   let fileTree: FileTree | null = null
   if (isFileProtocol) {
     document.body.classList.add(className.HAS_FILE_TREE)
-    fileTree = new FileTree(configData.expandedFolders)
+    fileTree = new FileTree(configData.expandedFolders, navigateToFile)
+  }
+
+  function navigateToFile(filePath: string) {
+    chrome.runtime.sendMessage(
+      { action: 'bg-fetch', data: { url: filePath } },
+      response => {
+        if (response?.success && response.data) {
+          mdRaw = response.data
+          contentRender(mdRaw)
+          renderSide()
+          if (rawContainer) rawContainer.textContent = mdRaw
+          const fileName = filePath.split('/').pop() || ''
+          document.title = fileName
+          window.scrollTo(0, 0)
+        } else {
+          window.location.href = filePath
+        }
+      },
+    )
   }
 
   const rawContainer = getRawContainer()

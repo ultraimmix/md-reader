@@ -302,8 +302,13 @@ export default class FileTree {
   private searchQuery: string = ''
   private currentFilePath: string
   private rootPath: string
+  private onNavigate?: (path: string) => void
 
-  constructor(expandedFolders: string[] = []) {
+  constructor(
+    expandedFolders: string[] = [],
+    onNavigate?: (path: string) => void,
+  ) {
+    this.onNavigate = onNavigate
     this.expandedFolders = new Set(expandedFolders)
     this.currentFilePath = window.location.href
     this.rootPath = this.getDirectoryPath(this.currentFilePath)
@@ -450,7 +455,13 @@ export default class FileTree {
         `
         item.addEventListener('click', e => {
           e.preventDefault()
-          window.location.href = node.path
+          if (this.onNavigate) {
+            this.currentFilePath = node.path
+            this.renderTree()
+            this.onNavigate(node.path)
+          } else {
+            window.location.href = node.path
+          }
         })
       }
 
