@@ -2,6 +2,11 @@
 @side-width: 260px;
 @file-tree-width: 260px;
 
+// Hide raw content before extension renders to prevent flash
+body:not(.md-reader) {
+  visibility: hidden !important;
+}
+
 body.md-reader {
   margin: 0;
   padding: 0;

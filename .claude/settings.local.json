@@ -5,7 +5,13 @@
       "Bash(pnpm build:*)",
       "Bash(pnpm install:*)",
       "WebSearch",
-      "WebFetch(domain:chromium.googlesource.com)"
+      "WebFetch(domain:chromium.googlesource.com)",
+      "Bash(git -C /Users/hoo/OpenSource/tools/md-reader status)",
+      "Bash(git -C /Users/hoo/OpenSource/tools/md-reader diff --stat)",
+      "Bash(git -C /Users/hoo/OpenSource/tools/md-reader log --oneline -5)",
+      "Bash(git -C /Users/hoo/OpenSource/tools/md-reader diff src/core/file-tree.ts src/main.ts)",
+      "Bash(git -C /Users/hoo/OpenSource/tools/md-reader add src/core/file-tree.ts src/main.ts)",
+      "Bash(git -C /Users/hoo/OpenSource/tools/md-reader commit -m \"$\\(cat <<''EOF''\nfix: SPA navigation for file tree to avoid source flash\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }

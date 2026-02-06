@@ -64,6 +64,7 @@ function main(data: Data) {
   })
 
   if (!configData.enable || !CONTENT_TYPES.includes(document.contentType)) {
+    document.body.style.visibility = 'visible'
     return
   }
 
