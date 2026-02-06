@@ -8,6 +8,7 @@ import className from '@/config/class-name'
 import type { Theme } from '@/config/page-themes'
 import { getDefaultData, type Data } from '@/core/data'
 import { mdRender, type MdOptions } from '@/core/markdown'
+import FileTree from '@/core/file-tree'
 import {
   getHeads,
   getRawContainer,
@@ -52,6 +53,9 @@ function main(data: Data) {
     toggleSide() {
       onToggleSide()
     },
+    toggleFileTree() {
+      onToggleFileTree()
+    },
   }
   chrome.runtime.onMessage.addListener(({ action, data: { key, value } }) => {
     const oldValue = configData[key]
@@ -73,10 +77,16 @@ function main(data: Data) {
 
   /* init md page */
   setTheme(configData.pageTheme)
-  document.body.classList.toggle(
-    className.SIDE_COLLAPSED,
-    configData.hiddenSide,
-  )
+  configData.hiddenSide = false
+  configData.hiddenFileTree = false
+
+  /* init file tree (file:// protocol only) */
+  const isFileProtocol = window.location.protocol === 'file:'
+  let fileTree: FileTree | null = null
+  if (isFileProtocol) {
+    document.body.classList.add(className.HAS_FILE_TREE)
+    fileTree = new FileTree(configData.expandedFolders)
+  }
 
   const rawContainer = getRawContainer()
   lifecycle.init(rawContainer)
@@ -142,7 +152,11 @@ function main(data: Data) {
     svg(codeIcon),
   )
   rawToggleBtn.on('click', () => {
-    lifecycle.toggleRaw([mdBody, mdSide])
+    const eles: Ele[] = [mdBody, mdSide]
+    if (fileTree) {
+      eles.push(new Ele<HTMLElement>(fileTree.ele))
+    }
+    lifecycle.toggleRaw(eles)
   })
 
   /* render side expand button */
@@ -194,6 +208,12 @@ function main(data: Data) {
     e.preventDefault()
     return false
   }
+  function onToggleFileTree() {
+    configData.hiddenFileTree = document.body.classList.toggle(
+      className.FILE_TREE_COLLAPSED,
+    )
+  }
+
   /* render go top button */
   const goTopBtn = new Ele<HTMLElement>(
     'button',
@@ -213,7 +233,11 @@ function main(data: Data) {
   )
 
   /* mount elements */
-  lifecycle.mount([buttonWrap, mdBody, mdSide])
+  const mountNodes: (Ele | HTMLElement)[] = [buttonWrap, mdBody, mdSide]
+  if (fileTree) {
+    mountNodes.unshift(fileTree.ele)
+  }
+  lifecycle.mount(mountNodes)
   updateAnchorPosition()
 
   darkMediaQuery.addEventListener('change', (e: MediaQueryListEvent) => {

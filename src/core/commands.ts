@@ -10,6 +10,9 @@ export default {
   async toggleRefresh(handler) {
     await toggle(handler, 'refresh', false)
   },
+  async toggleFileTree(handler) {
+    await toggle(handler, 'hiddenFileTree', false)
+  },
   async toggleTheme(handler) {
     let { pageTheme = 'light' } = await storage.get('pageTheme')
     const value = pageTheme === 'light' ? 'dark' : 'light'

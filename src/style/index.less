@@ -1,5 +1,6 @@
 @import url('./variable.less');
 @side-width: 260px;
+@file-tree-width: 260px;
 
 body.md-reader {
   margin: 0;
@@ -251,6 +252,228 @@ body.md-reader {
       }
     }
   }
+
+  // --- has-file-tree: three-column layout (file tree left, content center, TOC right) ---
+  &.has-file-tree {
+    .md-reader {
+      &__file-tree-side {
+        .scrollbar();
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: @file-tree-width;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-side-bg);
+        border-right: 1px solid var(--color-side-border);
+        color: var(--color-side);
+        font-size: 13px;
+        z-index: 1;
+        transition: transform 0.3s, box-shadow 0.5s;
+        will-change: transform, box-shadow;
+
+        &__header {
+          display: flex;
+          align-items: center;
+          padding: 12px 16px;
+          border-bottom: 1px solid var(--color-side-border);
+          font-weight: 600;
+          font-size: 14px;
+        }
+
+        &__search {
+          display: flex;
+          align-items: center;
+          padding: 8px 12px;
+          border-bottom: 1px solid var(--color-side-border);
+
+          .md-reader__file-tree-side__search-icon {
+            flex-shrink: 0;
+            margin-right: 6px;
+            color: var(--color-text-gray);
+            display: flex;
+            align-items: center;
+          }
+
+          input {
+            flex: 1;
+            border: 1px solid var(--color-side-border);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            outline: none;
+            &:focus {
+              border-color: var(--color-primary);
+            }
+          }
+        }
+
+        &__content {
+          flex: 1;
+          overflow-y: auto;
+          .scrollbar();
+        }
+      }
+
+      &__file-tree {
+        display: flex;
+        flex-direction: column;
+        padding: 4px 0;
+      }
+
+      &__file-tree__item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        user-select: none;
+        min-height: 28px;
+        margin: 0 4px;
+
+        &:hover {
+          background: var(--color-primary-alpha-10);
+        }
+
+        &.active {
+          background: var(--color-primary-alpha-10);
+          color: var(--color-primary);
+          font-weight: 600;
+        }
+
+        .file-chevron {
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          color: var(--color-text-gray);
+        }
+
+        .file-icon {
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          color: var(--color-text-gray);
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        &.is-folder .file-icon {
+          color: #e8a838;
+        }
+
+        .file-name {
+          flex: 1;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          mark {
+            background: rgba(255, 200, 0, 0.3);
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 2px;
+          }
+        }
+      }
+
+      // Move TOC to right side
+      &__side {
+        left: auto;
+        right: 0;
+        border-right: none;
+        border-left: 1px solid var(--color-side-border);
+      }
+
+      // Body gets padding on both sides
+      &__body {
+        padding-left: @file-tree-width;
+        padding-right: @side-width;
+      }
+
+      // Side expand button moves to right side
+      &__btn--side-expand {
+        left: auto;
+        right: 16px;
+        transform: translateX(-@side-width);
+      }
+    }
+
+    // side-collapsed: TOC hidden (slides right)
+    &.side-collapsed {
+      .md-reader {
+        &__side {
+          transform: translateX(100%);
+          border-color: transparent;
+        }
+        &__body {
+          padding-right: 0;
+        }
+        // Offset by -(32px + 16px) to avoid overlapping code-toggle button
+        &__btn--side-expand {
+          transform: translateX(-48px);
+        }
+      }
+    }
+
+    // side-expanded (responsive overlay for TOC on right)
+    &.side-expanded {
+      .md-reader {
+        &__side {
+          box-shadow: var(--color-side-shadow);
+          transform: translateX(0);
+        }
+        &__btn--side-expand {
+          transform: translateX(50px);
+        }
+      }
+    }
+
+    // file-tree-collapsed: file tree hidden (slides left)
+    &.file-tree-collapsed {
+      .md-reader {
+        &__file-tree-side {
+          transform: translateX(-100%);
+          border-color: transparent;
+        }
+        &__body {
+          padding-left: 0;
+        }
+      }
+    }
+
+    // Responsive: both panels hide on narrow screens
+    @media screen and (max-width: 960px) {
+      .md-reader {
+        &__file-tree-side {
+          transform: translateX(-100%);
+          border-color: transparent;
+        }
+        &__side {
+          transform: translateX(100%);
+          border-color: transparent;
+        }
+        &__body {
+          padding-left: 0;
+          padding-right: 0;
+        }
+        &__btn--side-expand {
+          transform: translateX(-48px);
+        }
+      }
+    }
+  }
 }
 
 .md-reader {
@@ -261,7 +484,7 @@ body.md-reader {
     top: 16px;
     left: 0;
     right: 0;
-    z-index: 1;
+    z-index: 2;
   }
 
   &__btn {

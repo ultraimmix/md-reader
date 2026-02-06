@@ -10,6 +10,8 @@ export interface Data {
   mdPlugins?: typeof MD_PLUGINS
   pageTheme?: typeof PAGE_THEMES[0]
   hiddenSide?: boolean
+  hiddenFileTree?: boolean
+  expandedFolders?: string[]
 }
 
 export function getDefaultData(mergeData: Data = {}): Data {
@@ -18,6 +20,8 @@ export function getDefaultData(mergeData: Data = {}): Data {
     refresh: false,
     centered: true,
     hiddenSide: false,
+    hiddenFileTree: false,
+    expandedFolders: [],
     language: i18n().locale,
     mdPlugins: [...MD_PLUGINS],
     pageTheme: PAGE_THEMES[0],

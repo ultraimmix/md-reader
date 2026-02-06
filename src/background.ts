@@ -21,6 +21,12 @@ async function messageHandler(
     case 'fetch':
       fetchData(sender.url).then(callback)
       break
+    case 'bg-fetch':
+      fetch(data.url)
+        .then(res => res.text())
+        .then(text => callback?.({ success: true, data: text }))
+        .catch(err => callback?.({ success: false, error: err.message }))
+      break
   }
 }
 
@@ -51,6 +57,7 @@ const actionMap = {
   mdPlugins: 'updateMdPlugins',
   pageTheme: 'updatePageTheme',
   hiddenSide: 'toggleSide',
+  hiddenFileTree: 'toggleFileTree',
 }
 
 function updatePage(key: keyof typeof actionMap, value?: any) {
