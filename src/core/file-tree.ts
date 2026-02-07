@@ -34,6 +34,10 @@ function makeNode(name: string, path: string, isDir: boolean): TreeNode | null {
   const cleanName = isDir ? name.replace(/\/$/, '') : name
   const isMd = !isDir && isMarkdownFile(cleanName)
   if (!isDir && !isMd) return null
+  // Ensure directory paths end with '/' so URL resolution works correctly
+  if (isDir && !path.endsWith('/')) {
+    path += '/'
+  }
   return {
     name: cleanName,
     path,
@@ -304,6 +308,8 @@ export default class FileTree {
   private rootPath: string
   private onNavigate?: (path: string) => void
 
+  private static ROOT_KEY = 'md-reader-file-tree-root'
+
   constructor(
     expandedFolders: string[] = [],
     onNavigate?: (path: string) => void,
@@ -311,9 +317,27 @@ export default class FileTree {
     this.onNavigate = onNavigate
     this.expandedFolders = new Set(expandedFolders)
     this.currentFilePath = window.location.href
-    this.rootPath = this.getDirectoryPath(this.currentFilePath)
+    this.rootPath = this.resolveRootPath(this.currentFilePath)
     this.create()
     this.loadRoot()
+  }
+
+  private resolveRootPath(filePath: string): string {
+    const currentDir = this.getDirectoryPath(filePath)
+    try {
+      const stored = sessionStorage.getItem(FileTree.ROOT_KEY)
+      if (stored && filePath.startsWith(stored)) {
+        return stored
+      }
+    } catch {
+      // sessionStorage may not be available
+    }
+    try {
+      sessionStorage.setItem(FileTree.ROOT_KEY, currentDir)
+    } catch {
+      // ignore
+    }
+    return currentDir
   }
 
   get ele(): HTMLElement {

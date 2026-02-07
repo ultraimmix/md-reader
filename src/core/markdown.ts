@@ -28,7 +28,7 @@ const PLUGINS: Plugins = {
   Sup: [mSup],
   Ins: [mIns],
   Abbr: [mAbbr],
-  Katex: [mKatex],
+  Katex: [mKatex, { strict: false }],
   Mermaid: ({ theme }) => [
     mMermaid,
     { theme: theme === 'dark' ? 'dark' : 'default', themeVariables: undefined },

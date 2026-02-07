@@ -89,7 +89,7 @@ function main(data: Data) {
     fileTree = new FileTree(configData.expandedFolders, navigateToFile)
   }
 
-  function navigateToFile(filePath: string) {
+  function loadFileContent(filePath: string) {
     chrome.runtime.sendMessage(
       { action: 'bg-fetch', data: { url: filePath } },
       response => {
@@ -107,6 +107,23 @@ function main(data: Data) {
       },
     )
   }
+
+  function navigateToFile(filePath: string) {
+    try {
+      history.pushState({ filePath }, '', filePath)
+      loadFileContent(filePath)
+    } catch {
+      // file:// pushState not supported, fall back to full navigation
+      window.location.href = filePath
+    }
+  }
+
+  window.addEventListener('popstate', e => {
+    const state = e.state
+    if (state?.filePath) {
+      loadFileContent(state.filePath)
+    }
+  })
 
   const rawContainer = getRawContainer()
   lifecycle.init(rawContainer)
